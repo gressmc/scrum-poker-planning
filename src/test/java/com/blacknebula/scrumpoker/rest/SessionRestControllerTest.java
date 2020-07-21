@@ -8,6 +8,7 @@ import com.blacknebula.scrumpoker.dto.ThemeDto;
 import com.blacknebula.scrumpoker.enums.CardSetEnum;
 import com.blacknebula.scrumpoker.exception.CustomErrorCode;
 import com.blacknebula.scrumpoker.exception.CustomException;
+import com.blacknebula.scrumpoker.jira.JiraService;
 import com.blacknebula.scrumpoker.service.SessionService;
 import com.blacknebula.scrumpoker.utils.JsonSerializer;
 import org.assertj.core.api.Assertions;
@@ -42,6 +43,9 @@ public class SessionRestControllerTest {
 
     @MockBean
     private SessionService sessionService;
+
+    @MockBean
+    private JiraService jiraService;
 
     /**
      * @verifies return 200 status

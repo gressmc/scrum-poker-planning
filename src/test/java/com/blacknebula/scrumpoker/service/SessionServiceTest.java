@@ -16,6 +16,7 @@ import com.blacknebula.scrumpoker.enums.UserRole;
 import com.blacknebula.scrumpoker.enums.WsTypes;
 import com.blacknebula.scrumpoker.exception.CustomErrorCode;
 import com.blacknebula.scrumpoker.exception.CustomException;
+import com.blacknebula.scrumpoker.jira.JiraService;
 import com.blacknebula.scrumpoker.repository.SessionRepository;
 import com.blacknebula.scrumpoker.repository.StoryRepository;
 import com.blacknebula.scrumpoker.repository.UserRepository;
@@ -41,6 +42,8 @@ public class SessionServiceTest extends ApplicationTest {
 
     @Autowired
     private SessionService sessionService;
+    @Autowired
+    private JiraService jiraService;
     @Autowired
     private SessionRepository sessionRepository;
     @Autowired
