@@ -105,7 +105,7 @@ public class StoryService {
     public StoryCreationDto createStory(StoryCreationDto storyCreationDto) {
         final Principal principal = authenticationService.checkAuthenticatedAdmin();
 
-        if (StringUtils.isEmpty(storyCreationDto.getStoryName())) {
+        if (StringUtils.isBlank(storyCreationDto.getStoryName())) {
             throw new CustomException(CustomErrorCode.BAD_ARGS, "story name should not be null or empty");
         }
 
