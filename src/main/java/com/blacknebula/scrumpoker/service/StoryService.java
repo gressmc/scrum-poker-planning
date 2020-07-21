@@ -8,11 +8,13 @@ import com.blacknebula.scrumpoker.entity.def.StoryEntityDef;
 import com.blacknebula.scrumpoker.enums.WsTypes;
 import com.blacknebula.scrumpoker.exception.CustomErrorCode;
 import com.blacknebula.scrumpoker.exception.CustomException;
+import com.blacknebula.scrumpoker.jira.JiraService;
+import com.blacknebula.scrumpoker.jira.model.Issue;
 import com.blacknebula.scrumpoker.repository.StoryRepository;
 import com.blacknebula.scrumpoker.security.Principal;
-import com.blacknebula.scrumpoker.utils.StringUtils;
 import com.blacknebula.scrumpoker.websocket.WebSocketSender;
 import com.google.common.collect.ImmutableMap;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -31,13 +33,16 @@ public class StoryService {
     private final StoryRepository storyRepository;
     private final WebSocketSender webSocketSender;
     private final AuthenticationService authenticationService;
+    private final JiraService jiraService;
 
     public StoryService(StoryRepository storyRepository,
                         WebSocketSender webSocketSender,
-                        AuthenticationService authenticationService) {
+                        AuthenticationService authenticationService,
+                        JiraService pJiraService) {
         this.storyRepository = storyRepository;
         this.webSocketSender = webSocketSender;
         this.authenticationService = authenticationService;
+        this.jiraService = pJiraService;
     }
 
     /**
@@ -100,14 +105,18 @@ public class StoryService {
     public StoryCreationDto createStory(StoryCreationDto storyCreationDto) {
         final Principal principal = authenticationService.checkAuthenticatedAdmin();
 
-        if (StringUtils.isEmpty(storyCreationDto.getStoryName(), true)) {
+        if (StringUtils.isEmpty(storyCreationDto.getStoryName())) {
             throw new CustomException(CustomErrorCode.BAD_ARGS, "story name should not be null or empty");
         }
 
-        final StoryEntity storyEntity = new StoryEntity(principal.getSessionId(), storyCreationDto.getStoryName(),
+        Issue issue = jiraService.getIssue(storyCreationDto.getStoryName());
+        String desc = issue != null ? issue.getFields().getDescription() : StringUtils.EMPTY;
+
+        final StoryEntity storyEntity = new StoryEntity(principal.getSessionId(), storyCreationDto.getStoryName(), storyCreationDto.getStoryId(), desc,
                 storyCreationDto.getOrder());
         storyRepository.save(storyEntity);
         storyCreationDto.setStoryId(storyEntity.getStoryId());
+        storyCreationDto.setStoryName(storyEntity.getStoryName());
         webSocketSender.sendNotification(storyEntity.getSessionId(), WsTypes.STORY_ADDED, storyCreationDto);
         return storyCreationDto;
     }

@@ -11,6 +11,8 @@ import com.blacknebula.scrumpoker.enums.UserRole;
 import com.blacknebula.scrumpoker.enums.WsTypes;
 import com.blacknebula.scrumpoker.exception.CustomErrorCode;
 import com.blacknebula.scrumpoker.exception.CustomException;
+import com.blacknebula.scrumpoker.jira.JiraService;
+import com.blacknebula.scrumpoker.jira.model.Issue;
 import com.blacknebula.scrumpoker.repository.SessionRepository;
 import com.blacknebula.scrumpoker.repository.StoryRepository;
 import com.blacknebula.scrumpoker.repository.UserRepository;
@@ -18,12 +20,13 @@ import com.blacknebula.scrumpoker.security.JwtService;
 import com.blacknebula.scrumpoker.security.Principal;
 import com.blacknebula.scrumpoker.utils.DateUtils;
 import com.blacknebula.scrumpoker.utils.HashId;
-import com.blacknebula.scrumpoker.utils.StringUtils;
 import com.blacknebula.scrumpoker.websocket.WebSocketSender;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
@@ -41,6 +44,8 @@ public class SessionService {
     private final AuthenticationService authenticationService;
     private final WebSocketSender webSocketSender;
 
+    private final JiraService jiraService;
+
     private final String applicationId;
 
     public SessionService(SessionRepository sessionRepository,
@@ -49,7 +54,8 @@ public class SessionService {
                           JwtService jwtService,
                           AuthenticationService authenticationService,
                           WebSocketSender webSocketSender,
-                          @Value("${application.id}") String applicationId) {
+                          @Value("${application.id}") String applicationId,
+                          JiraService jiraService) {
         this.sessionRepository = sessionRepository;
         this.userRepository = userRepository;
         this.storyRepository = storyRepository;
@@ -57,6 +63,7 @@ public class SessionService {
         this.authenticationService = authenticationService;
         this.webSocketSender = webSocketSender;
         this.applicationId = applicationId;
+        this.jiraService = jiraService;
     }
 
     /**
@@ -86,7 +93,7 @@ public class SessionService {
             throw new CustomException(CustomErrorCode.BAD_ARGS, "Session should not be null");
         }
 
-        if (StringUtils.isEmpty(sessionCreationDto.getUsername(), true)) {
+        if (StringUtils.isEmpty(sessionCreationDto.getUsername())) {
             throw new CustomException(CustomErrorCode.BAD_ARGS, "Username should not be null");
         }
 
@@ -103,7 +110,7 @@ public class SessionService {
 
         //save stories
         if (!CollectionUtils.isEmpty(sessionCreationDto.getStories())) {
-            final List<StoryEntity> storyEntities = sessionCreationDto.toStories(sessionEntity.getSessionId());
+            final List<StoryEntity> storyEntities = toStories(sessionCreationDto, sessionEntity.getSessionId());
             storyRepository.saveAll(storyEntities);
         }
         //save user
@@ -134,5 +141,18 @@ public class SessionService {
         sessionRepository.save(sessionEntity);
         webSocketSender.sendNotification(sessionEntity.getSessionId(), WsTypes.THEME_CHANGED, themeDto);
         return themeDto;
+    }
+
+    public List<StoryEntity> toStories(SessionCreationDto sessionCreationDto, String sessionId) {
+        final List<StoryEntity> storyEntities = new ArrayList<>();
+        int order = 1;
+        for (String storyId : sessionCreationDto.getStories()) {
+            Issue issue = jiraService.getIssue(storyId);
+            String desc = issue != null ? issue.getFields().getDescription() : StringUtils.EMPTY;
+            String summary = issue != null ? issue.getFields().getSummary() : StringUtils.EMPTY;
+            storyEntities.add(new StoryEntity(sessionId, summary, storyId, desc, order));
+            order++;
+        }
+        return storyEntities;
     }
 }

@@ -17,13 +17,17 @@ public class StoryEntity {
     private int order;
     @Field(StoryEntityDef.ENDED)
     private boolean ended;
+    @Field(StoryEntityDef.DESCRIPTION)
+    private String description;
 
     public StoryEntity() {
     }
 
-    public StoryEntity(String sessionId, String storyName, int order) {
+    public StoryEntity(String sessionId, String storyName, String storyId, String description, int order) {
         this.sessionId = sessionId;
+        this.storyId = storyId;
         this.storyName = storyName;
+        this.description = description;
         this.order = order;
     }
 
@@ -65,5 +69,13 @@ public class StoryEntity {
 
     public void setStoryName(String storyName) {
         this.storyName = storyName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String pDescription) {
+        description = pDescription;
     }
 }

@@ -5,10 +5,12 @@ var dashboardController = angular.module('dashboardController', []);
 dashboardController.controller('dashboardCtrl', function ($scope, $location, $localStorage, $log, sessionFactory) {
     function init() {
         $scope.show_modal = false;
+        $scope.show_jira_modal = false;
         $scope.stories = [];
-        $scope.cardSet = 'time';
+        $scope.cardSet = 'fibonacci';
         $scope.cardTheme = 'none';
         $scope.storyNamePrefix = '';
+        $scope.jiraUser = {};
     }
 
     $scope.convertToStories = function () {
@@ -44,8 +46,26 @@ dashboardController.controller('dashboardCtrl', function ($scope, $location, $lo
         $scope.show_modal = true;
     };
 
+    $scope.openJiraModal = function () {
+        $scope.show_jira_modal = true;
+    };
+
     $scope.closeModal = function () {
         $scope.show_modal = false;
+        $scope.show_jira_modal = false;
+    };
+
+    $scope.saveJiraUser = function (jiraname, token, location) {
+        $scope.jiraUser = {};
+
+        if (jiraname && token && location) {
+            $scope.jiraUser = {
+                jiraname: jiraname,
+                token: token,
+                location: location
+            };
+        }
+        $scope.closeModal();
     };
 
     $scope.save = function (username) {
@@ -58,7 +78,8 @@ dashboardController.controller('dashboardCtrl', function ($scope, $location, $lo
             storyNamePrefix: $scope.storyNamePrefix,
             cardSet: $scope.cardSet,
             cardTheme: $scope.cardTheme,
-            stories: $scope.stories
+            stories: $scope.stories,
+            jiraUser: $scope.jiraUser
         };
 
         sessionFactory.create(data, function (response) {

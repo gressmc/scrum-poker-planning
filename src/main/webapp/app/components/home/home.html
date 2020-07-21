@@ -234,8 +234,8 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr ng-repeat="story in stories | storiesFilter:showEndedStories" ng-click="setCurrentStory(story)">
-                        <td class="left aligned">
+                    <tr ng-repeat="story in stories | storiesFilter:showEndedStories">
+                        <td class="left aligned" ng-click="setCurrentStory(story)">
                             <button class="circular ui icon button">
                                 <i class="icon flag"
                                    ng-class="{outline : story.storyId !== currentStory.storyId,
@@ -245,7 +245,7 @@
                             </button>
                         </td>
                         <td>{{story.order}}</td>
-                        <td>{{story.storyName}}</td>
+                        <td ng-click="openDescModal(story)">{{story.storyId}}</td>
                         <td class="right aligned">
                             <div class="ui small basic icon buttons"
                                  ng-if="currentUser.admin && story.storyId !== currentStory.storyId">
@@ -327,4 +327,20 @@
             </div>
         </div>
     </div>
+
+    <modal ng-model="show_modal">
+        <i class="close icon" ng-click="closeModal()"></i>
+        <div class="header">
+            {{storyName}}
+        </div>
+        <div class="image content">
+            <div class="image">
+                <i class="wizard icon"></i>
+            </div>
+
+            <div class="description">
+                <div style="white-space: pre-line" ng-bind-html="description"></div>
+            </div>
+        </div>
+    </modal>s
 </div>

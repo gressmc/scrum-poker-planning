@@ -16,6 +16,7 @@ public class SessionCreationDto {
     private String storyNamePrefix;
     private String cardTheme;
     private String cardSet;
+    private JiraUserDto jiraUser;
     private List<String> stories = new ArrayList<>();
 
     public SessionCreationDto() {
@@ -30,15 +31,6 @@ public class SessionCreationDto {
         return sessionEntity;
     }
 
-    public List<StoryEntity> toStories(String sessionId) {
-        final List<StoryEntity> storyEntities = new ArrayList<>();
-        int order = 1;
-        for (String story : stories) {
-            storyEntities.add(new StoryEntity(sessionId, story, order));
-            order++;
-        }
-        return storyEntities;
-    }
 
     public String getCardSet() {
         return cardSet;
@@ -86,5 +78,13 @@ public class SessionCreationDto {
 
     public void setCardTheme(String cardTheme) {
         this.cardTheme = cardTheme;
+    }
+
+    public JiraUserDto getJiraUser() {
+        return jiraUser;
+    }
+
+    public void setJiraUser(JiraUserDto pJiraUser) {
+        jiraUser = pJiraUser;
     }
 }

@@ -11,6 +11,7 @@ public class StoryDto {
     private String storyName;
     private int order;
     private boolean ended;
+    private String description;
 
     public StoryDto() {
     }
@@ -20,6 +21,7 @@ public class StoryDto {
         this.storyName = storyEntity.getStoryName();
         this.order = storyEntity.getOrder();
         this.ended = storyEntity.isEnded();
+        this.description = storyEntity.getDescription();
     }
 
     public String getStoryId() {
@@ -65,5 +67,13 @@ public class StoryDto {
     public StoryDto setEnded(boolean ended) {
         this.ended = ended;
         return this;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String pDescription) {
+        description = pDescription;
     }
 }

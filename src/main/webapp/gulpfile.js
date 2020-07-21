@@ -46,7 +46,9 @@ gulp.task('js-libs', function () {
         'node_modules/clipboard/dist/clipboard.min.js',
         'node_modules/angular/angular.min.js',
         'node_modules/angular-route/angular-route.min.js',
+        'node_modules/angular-sanitize/angular-sanitize.min.js',
         'node_modules/ng-stomp/dist/ng-stomp.standalone.min.js',
+        'node_modules/showdown/dist/showdown.min.js',
         'node_modules/ngstorage/ngStorage.min.js'])
         .pipe(concat('libs.js'))
         .pipe(size({title: 'js-libs'}))

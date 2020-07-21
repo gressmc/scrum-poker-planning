@@ -16,6 +16,7 @@ WORKDIR /app
 COPY --from=builder /app/target/scrum_poker.jar .
 
 EXPOSE 8080
+EXPOSE 12161
 # Define active profile
 ENV SPRING_PROFILES_ACTIVE=docker
-CMD ["sh", "-c", "java -Dspring.profiles.active=${SPRING_PROFILES_ACTIVE} -jar /app/scrum_poker.jar"]
+CMD ["sh", "-c", "java -Dspring.profiles.active=${SPRING_PROFILES_ACTIVE} -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=12161 -jar /app/scrum_poker.jar"]

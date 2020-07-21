@@ -37,10 +37,12 @@
   "dependencies": {
     "angular": "^1.6.2",
     "angular-route": "^1.6.2",
+    "angular-sanitize": "^1.6.2",
     "clipboard": "^1.6.0",
     "jquery": "^3.0.0",
     "ng-stomp": "^0.4.0",
     "ngstorage": "^0.3.11",
+    "showdown": "^1.9.1",
     "semantic-ui-css": "^2.2.9"
   }
 }

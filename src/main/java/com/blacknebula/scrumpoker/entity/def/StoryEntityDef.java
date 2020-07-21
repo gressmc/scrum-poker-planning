@@ -5,6 +5,7 @@ public class StoryEntityDef {
     public static final String SESSION_ID = "sid";
     public static final String ORDER = "ord";
     public static final String ENDED = "end";
+    public static final String DESCRIPTION = "desc";
 
     private StoryEntityDef() {
     }

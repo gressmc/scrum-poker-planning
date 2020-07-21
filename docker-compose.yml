@@ -20,6 +20,7 @@ services:
       dockerfile: Dockerfile-api
     ports:
       - 9001:8080
+      - 12161:12161
     depends_on:
       - mongodb
 

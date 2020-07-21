@@ -110,6 +110,114 @@ homeController.controller('homeCtrl', function ($http, $log, $scope, $localStora
         });
     };
 
+    $scope.openDescModal = function (story) {
+        if (story.description) {
+            story.description=$scope.toM(story.description);
+            var converter = new showdown.Converter();
+            $scope.description = converter.makeHtml(story.description)
+            $scope.storyName = story.storyName;
+            $scope.show_modal = true;
+        }
+    };
+
+    $scope.closeModal = function () {
+        $scope.description='';
+        $scope.storyName='';
+        $scope.show_modal = false;
+    };
+
+    $scope.toM = function (input) {
+
+        input = input.replace(/^bq\.(.*)$/gm, function (match, content) {
+            return '> ' + content + "\n";
+        });
+
+        input = input.replace(/([*_])(.*)\1/g, function (match,wrapper,content) {
+            var to = (wrapper === '*') ? '**' : '*';
+            return to + content + to;
+        });
+
+        // multi-level numbered list
+        input = input.replace(/^((?:#|-|\+|\*)+) (.*)$/gm, function (match, level, content) {
+            var len = 2;
+            var prefix = '1.';
+            if (level.length > 1) {
+                len = parseInt((level.length - 1) * 4) + 2;
+            }
+
+            // take the last character of the level to determine the replacement
+            var prefix = level[level.length - 1];
+            if (prefix == '#') prefix = '1.';
+
+            return Array(len).join(" ") + prefix + ' ' + content;
+        });
+
+        // headers, must be after numbered lists
+        input = input.replace(/^h([0-6])\.(.*)$/gm, function (match,level,content) {
+            return Array(parseInt(level) + 1).join('#') + content;
+        });
+
+        input = input.replace(/\{\{([^}]+)\}\}/g, '`$1`');
+        input = input.replace(/\?\?((?:.[^?]|[^?].)+)\?\?/g, '<cite>$1</cite>');
+        input = input.replace(/\+([^+]*)\+/g, '<ins>$1</ins>');
+        input = input.replace(/\^([^^]*)\^/g, '<sup>$1</sup>');
+        input = input.replace(/~([^~]*)~/g, '<sub>$1</sub>');
+        input = input.replace(/-([^-]*)-/g, '-$1-');
+
+        input = input.replace(/\{code(:([a-z]+))?\}([^]*?)\{code\}/gm, '```$2$3```');
+        input = input.replace(/\{quote\}([^]*)\{quote\}/gm, function(match, content) {
+            var lines = content.split(/\r?\n/gm);
+
+            for (var i = 0; i < lines.length; i++) {
+                lines[i] = '> ' + lines[i];
+            }
+
+            return lines.join("\n");
+        });
+
+        input = input.replace(/!([^\n\s]+)!/, '![]($1)');
+        input = input.replace(/\[([^|]+)\|(.+?)\]/g, '[$1]($2)');
+        input = input.replace(/\[(.+?)\]([^\(]+)/g, '<$1>$2');
+
+        input = input.replace(/{noformat}/g, '```');
+        input = input.replace(/{color:([^}]+)}([^]*?){color}/gm, '<span style="color:$1">$2</span>');
+
+        // Convert header rows of tables by splitting input on lines
+        var lines = input.split(/\r?\n/gm);
+        var lines_to_remove = []
+        for (var i = 0; i < lines.length; i++) {
+            var line_content = lines[i];
+
+            var seperators = line_content.match(/\|\|/g);
+            if (seperators != null) {
+                lines[i] = lines[i].replace(/\|\|/g, "|");
+                console.log(seperators)
+
+                // Add a new line to mark the header in Markdown,
+                // we require that at least 3 -'s are between each |
+                var header_line = "";
+                for (var j = 0; j < seperators.length-1; j++) {
+                    header_line += "|---";
+                }
+
+                header_line += "|";
+
+                lines.splice(i+1, 0, header_line);
+
+            }
+        }
+
+        // Join the split lines back
+        input = ""
+        for (var i = 0; i < lines.length; i++) {
+            input += lines[i] + "\n"
+        }
+
+
+
+        return input;
+    };
+
     $scope.createVote = function (card) {
         $scope.loading = true;
         // hide error message
@@ -446,6 +554,8 @@ homeController.controller('homeCtrl', function ($http, $log, $scope, $localStora
         new Clipboard('.clipboard');
 
         $scope.showEndedStories = false;
+        $scope.description='';
+        $scope.storyName='';
 
         $scope.info = {
             selected: 'stories'
@@ -473,15 +583,7 @@ homeController.controller('homeCtrl', function ($http, $log, $scope, $localStora
         //get session info
         $scope.sprintName = session.sprintName;
         $scope.cardSet = session.cardSet;
-        if (session.cardSet === 'time') {
-            $scope.cards = cards.time;
-        } else if (session.cardSet === 'fibonacci') {
-            $scope.cards = cards.fibonacci;
-        } else if (session.cardSet === 'vote') {
-            $scope.cards = cards.vote;
-        } else {
-            $scope.cards = cards.modifiedFibonacci;
-        }
+        $scope.cards = cards.fibonacci;
 
         //get stories
         $scope.stories = stories;

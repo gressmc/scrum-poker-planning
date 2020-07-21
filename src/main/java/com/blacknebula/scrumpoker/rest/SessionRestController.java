@@ -3,6 +3,7 @@ package com.blacknebula.scrumpoker.rest;
 import com.blacknebula.scrumpoker.dto.SessionCreationDto;
 import com.blacknebula.scrumpoker.dto.SessionDto;
 import com.blacknebula.scrumpoker.dto.ThemeDto;
+import com.blacknebula.scrumpoker.jira.JiraService;
 import com.blacknebula.scrumpoker.security.SecurityContext;
 import com.blacknebula.scrumpoker.service.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,9 @@ public class SessionRestController {
     @Autowired
     private SessionService sessionService;
 
+    @Autowired
+    private JiraService jiraService;
+
     /**
      * @return SessionDto
      * @should return 200 status
@@ -44,6 +48,7 @@ public class SessionRestController {
     @RequestMapping(value = "/sessions", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<SessionCreationDto> createSession(@RequestBody SessionCreationDto sessionCreationDto, HttpServletResponse httpServletResponse) {
+        jiraService.init(sessionCreationDto.getJiraUser());
         return new ResponseEntity<>(sessionService.createSession(sessionCreationDto,
                 (token) -> httpServletResponse.addHeader(SecurityContext.Headers.JWT_TOKEN, token)), HttpStatus.OK);
     }

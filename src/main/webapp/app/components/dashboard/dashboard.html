@@ -12,39 +12,6 @@
                 <div class="ui stacked segment">
 
                     <div class="grouped fields">
-                        <label>Choose card set</label>
-
-                        <div class="field">
-                            <div class="ui radio checkbox block">
-                                <input type="radio" ng-model="cardSet" name="card-set" value="time">
-                                <label>Time ( 1h, 2h, 4h, 1d, 2d, 3d, 4d, 1w, ?, Pass, Break )</label>
-                            </div>
-                            <div class="ui radio checkbox block">
-                                <input type="radio" ng-model="cardSet" name="card-set" value="fibonacci">
-                                <label>Fibonacci ( 0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, ?, Pass, Break)</label>
-                            </div>
-                            <div class="ui radio checkbox block">
-                                <input type="radio" ng-model="cardSet" name="card-set" value="modifiedFibonacci">
-                                <label>Modified Fibonacci ( 0, ½, 1, 2, 3, 5, 8, 13, 20, 40, 100, ?, Pass,Break)</label>
-                            </div>
-                            <div class="ui radio checkbox block">
-                                <input type="radio" ng-model="cardSet" name="card-set" value="vote">
-                                <label>Vote ( Yes, Hold, No)</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="field">
-                        <label>Story name prefix</label>
-
-                        <div class="ui left icon input">
-                            <i class="tag icon"></i>
-                            <input type="text" name="storyNamePrefix" placeholder="task-" autofocus
-                                   ng-model="storyNamePrefix">
-                        </div>
-                    </div>
-
-                    <div class="grouped fields">
                         <label>Choose cards Theme</label>
 
                         <div class="field">
@@ -86,6 +53,12 @@
                                 <i class="icon exchange"></i>
                                 convert to stories
                             </div>
+
+                            <div style="margin-top: 5px" class="ui teal submit button"
+                                 ng-click="openJiraModal()">
+                                <i class="icon code branch"></i>
+                                connect to JIRA
+                            </div>
                         </div>
 
                         <div class="field" ng-hide="stories.length == 0">
@@ -122,6 +95,48 @@
 
         </div>
     </div>
+    <modal ng-model="show_jira_modal">
+        <i class="close icon" ng-click="closeModal()"></i>
+
+        <div class="header">
+            New poker planning session
+        </div>
+        <div class="image content">
+            <div class="image">
+                <i class="wizard icon"></i>
+            </div>
+            <div class="description">
+                <p>You can connect to JIRA account for information about issues</p>
+
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="user icon"></i>
+                        <input type="text" name="jiraname" placeholder="username" autofocus ng-model="jiraname">
+                    </div>
+                    <div class="ui left icon input">
+                        <i class="lock icon"></i>
+                        <input type="text" name="token" placeholder="token" ng-model="token">
+                    </div>
+                    <div class="ui left icon input">
+                        <i class="globe icon"></i>
+                        <input type="text" name="location" placeholder="location" ng-model="location">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="actions">
+            <div class="two fluid ui inverted buttons">
+                <div class="ui red basic inverted button" ng-click="closeModal()">
+                    <i class="remove icon"></i>
+                    No
+                </div>
+                <div class="ui green basic inverted button" ng-click="saveJiraUser(jiraname, token, location)">
+                    <i class="checkmark icon"></i>
+                    Yes
+                </div>
+            </div>
+        </div>
+    </modal>
     <modal ng-model="show_modal">
         <i class="close icon" ng-click="closeModal()"></i>
 

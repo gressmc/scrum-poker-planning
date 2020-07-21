@@ -14,7 +14,7 @@ var myApp = angular.module('scrumPokerApp', [
     'userFactory',
     'storyFactory',
     'sessionFactory',
-
+    'ngSanitize',
     'loginController',
     'dashboardController',
     'homeController',
